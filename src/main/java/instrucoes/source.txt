@@ -1,0 +1,3 @@
+https://coursera.cs.princeton.edu/algs4/assignments/baseball/specification.php
+https://github.com/GlaIZier/Java-Algorithms-Coursera-Course.git
+https://www.youtube.com/watch?v=vYFHNGGOlKE
