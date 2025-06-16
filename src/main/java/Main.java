@@ -42,6 +42,7 @@ public class Main {
 
         System.out.println("Selecione um arquivo: ");
         opcao = input.nextInt();
+//        opcao = 3;
 
         String arquivoEscolhido = caminho + times[opcao];
         BaseballElimination.main(new String[]{arquivoEscolhido});
