@@ -21,8 +21,8 @@ public class BaseballElimination {
 
     private final int[][] games;
 
-    // Possível implementação:
-    // Usar cache de times eliminados
+    // Cache de times eliminados
+    private Map<String, List<String>> eliminatedTeams;
 
     public BaseballElimination(String filename) {
         In in = new In(filename); // Ler o caminho do arquivo
@@ -33,6 +33,7 @@ public class BaseballElimination {
         losses = new int[numberOfTeams]; // Cria uma lista de derrotas de cada time
         remaining = new int[numberOfTeams]; // Cria uma de jogos restantes de cada time
         games = new int[numberOfTeams][numberOfTeams]; // Cria uma matriz de jogos, proporcional a quantidade de times presentes
+        eliminatedTeams = new HashMap<>(); // Cria a cache de times eliminados para otimização
 
         for (int i = 0; i < numberOfTeams; i++) {
             String name = in.readString(); // Armazena o nome do time
@@ -94,7 +95,15 @@ public class BaseballElimination {
             throw new IllegalArgumentException("Não existe esse time!");
         }
 
-        return certificateOfElimination(team) != null;
+        if (eliminatedTeams.containsKey(team)) return true;
+
+        List<String> certificate = (List<String>) certificateOfElimination(team);
+        if (certificate != null) {
+            eliminatedTeams.put(team, certificate);
+            return true;
+        }
+
+        return false;
     }
 
     public Iterable<String> certificateOfElimination(String team) throws IllegalArgumentException {
@@ -102,14 +111,27 @@ public class BaseballElimination {
             throw new IllegalArgumentException("Não existe esse time!");
         }
 
+        if (eliminatedTeams.containsKey(team)) {
+            return new ArrayList<>(eliminatedTeams.get(team));
+        }
+
         int x = teamIndex.get(team);
 
         // Checa eliminação trivial
         List<String> trivial = checkTrivialElimination(x);
-        if (trivial != null) return trivial;
+        if (trivial != null) {
+            eliminatedTeams.put(team, trivial);
+            return trivial;
+        }
 
         // Checa eliminação por fluxo (não trivial)
-        return checkNonTrivialElimination(x);
+        List<String> nonTrivial = checkNonTrivialElimination(x);
+        if (nonTrivial != null) {
+            eliminatedTeams.put(team, nonTrivial);
+            return nonTrivial;
+        }
+
+        return null;
     }
 
     private List<String> checkTrivialElimination(int teamIndex) {
